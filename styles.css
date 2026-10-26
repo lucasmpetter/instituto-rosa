@@ -81,7 +81,6 @@ main { overflow-x: clip }
 /* Resultados */
 .sec-resultados { background: #fff; position: relative; z-index: 3; margin-top: -100vh; border-radius: 40px 40px 0 0; box-shadow: 0 -24px 60px rgba(43, 40, 42, .08); padding: clamp(80px, 8vw, 120px) var(--gutter) clamp(40px, 4vw, 64px) }
 .resultados-grid { row-gap: clamp(40px, 5vw, 72px) }
-.resultados-head { grid-column: 3/7; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px }
 .cmp-fig { margin: 0; display: flex; flex-direction: column; gap: 18px }
 .cmp { position: relative; aspect-ratio: 4/5; border-radius: 30px; overflow: hidden; background: var(--mist); box-shadow: 0 30px 60px rgba(43, 40, 42, .14), 0 6px 16px rgba(43, 40, 42, .06); transition: transform .6s var(--ease) }
 .cmp-layer { position: absolute; inset: 0; background-size: cover; background-position: 50% 50% }

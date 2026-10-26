@@ -2,15 +2,18 @@
 (() => {
   const WHATSAPP = '5561999355665';
   const WA_MSG = 'Olá, Viviane! Vim pelo site e gostaria de agendar uma avaliação.';
+  // Ao trocar um vídeo mantendo o nome do arquivo, suba a versão dele aqui
+  // para furar o cache do Cloudflare e dos navegadores.
+  const VIDEO_VERSIONS = { 6: 2 };
   const VIDEOS = [
     'Aluna sentada na Chair fazendo exercício com o anel de Pilates, acompanhada pela fisioterapeuta',
     'Fisioterapeuta fazendo alongamento e liberação nas pernas de uma paciente deitada na maca',
     'Exercício de fortalecimento dos dedos do pé no aparelho corretor de pés',
     'Fisioterapeuta orientando uma aluna sentada no Cadillac em exercício com os braços na barra',
     'Aluno ajoelhado no Reformer abrindo os braços com as alças do aparelho',
-    'Aluna de macacão bordô fazendo exercício na Chair, empurrando os pedais do aparelho',
+    'Aluna em pé no Reformer fazendo agachamento com as pernas afastadas, acompanhada pela fisioterapeuta',
     'Aluno fazendo exercício de equilíbrio em pé sobre uma prancha',
-  ].map((alt, i) => ({ src: `./assets/video-${i + 1}.mp4`, alt }));
+  ].map((alt, i) => ({ src: `./assets/video-${i + 1}.mp4${VIDEO_VERSIONS[i + 1] ? `?v=${VIDEO_VERSIONS[i + 1]}` : ''}`, alt }));
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 

@@ -2,7 +2,15 @@
 (() => {
   const WHATSAPP = '5561999355665';
   const WA_MSG = 'Olá, Viviane! Vim pelo site e gostaria de agendar uma avaliação.';
-  const VIDEOS = [1, 2, 3, 4, 5, 6, 7].map((k) => `./assets/video-${k}.mp4`);
+  const VIDEOS = [
+    'Aluna sentada na Chair fazendo exercício com o anel de Pilates, acompanhada pela fisioterapeuta',
+    'Fisioterapeuta fazendo alongamento e liberação nas pernas de uma paciente deitada na maca',
+    'Exercício de fortalecimento dos dedos do pé no aparelho corretor de pés',
+    'Fisioterapeuta orientando uma aluna sentada no Cadillac em exercício com os braços na barra',
+    'Aluno ajoelhado no Reformer abrindo os braços com as alças do aparelho',
+    'Aluna de macacão bordô fazendo exercício na Chair, empurrando os pedais do aparelho',
+    'Aluno fazendo exercício de equilíbrio em pé sobre uma prancha',
+  ].map((alt, i) => ({ src: `./assets/video-${i + 1}.mp4`, alt }));
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -18,13 +26,14 @@
   // Painéis de vídeo do carrossel. O src só entra quando a seção se aproxima,
   // para não baixar ~100 MB de vídeo na abertura da página.
   const track = document.querySelector('[data-track]');
-  const videos = VIDEOS.map((src, i) => {
+  const videos = VIDEOS.map(({ src, alt }) => {
     const wrap = document.createElement('div');
     wrap.className = 'panel-wrap';
     wrap.innerHTML = '<div><div data-panel class="panel"></div></div>';
     const v = document.createElement('video');
     v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
-    v.setAttribute('aria-label', `Vídeo ${i + 1} do Instituto Rosa`);
+    v.setAttribute('aria-label', `Vídeo: ${alt}`);
+    v.title = alt;
     v.dataset.src = src;
     wrap.querySelector('[data-panel]').appendChild(v);
     track.appendChild(wrap);

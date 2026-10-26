@@ -35,6 +35,72 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400&display=swap">
 <link rel="stylesheet" href="./styles.css?v=4">
+
+<!-- Dados estruturados (schema.org): empresa local para a busca do Google -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Physiotherapy", "HealthClub"],
+      "@id": "https://institutorosa.com/#empresa",
+      "name": "Instituto Rosa — Pilates e Fisioterapia",
+      "alternateName": "Instituto Rosa",
+      "description": "Pilates, fisioterapia, liberação miofascial e ventosaterapia com a fisioterapeuta Viviane Rosa de Moraes, no Gama, DF.",
+      "url": "https://institutorosa.com/",
+      "logo": "https://institutorosa.com/assets/logo.png",
+      "image": [
+        "https://institutorosa.com/assets/og-image.jpg",
+        "https://institutorosa.com/assets/estudio.jpg",
+        "https://institutorosa.com/assets/viviane.webp"
+      ],
+      "telephone": "+55-61-99935-5665",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Quadra 1, Setor Industrial, Lote 960, Sobreloja 3 — Posto Avenida, em frente ao Corpo de Bombeiros",
+        "addressLocality": "Gama",
+        "addressRegion": "DF",
+        "addressCountry": "BR"
+      },
+      "areaServed": { "@type": "City", "name": "Gama, Distrito Federal" },
+      "sameAs": [
+        "https://www.instagram.com/instituto.rosaft/",
+        "https://www.instagram.com/vivianermoraes/"
+      ],
+      "founder": { "@id": "https://institutorosa.com/#viviane" },
+      "employee": { "@id": "https://institutorosa.com/#viviane" },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Atendimentos",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pilates" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Fisioterapia" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Liberação miofascial" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Ventosaterapia" } }
+        ]
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://institutorosa.com/#viviane",
+      "name": "Viviane Rosa de Moraes",
+      "jobTitle": "Fisioterapeuta",
+      "description": "Fisioterapeuta com pós-graduação em Reabilitação.",
+      "image": "https://institutorosa.com/assets/viviane.webp",
+      "worksFor": { "@id": "https://institutorosa.com/#empresa" },
+      "sameAs": ["https://www.instagram.com/vivianermoraes/"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://institutorosa.com/#site",
+      "url": "https://institutorosa.com/",
+      "name": "Instituto Rosa",
+      "inLanguage": "pt-BR",
+      "publisher": { "@id": "https://institutorosa.com/#empresa" }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 

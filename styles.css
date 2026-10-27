@@ -53,17 +53,49 @@ main { overflow-x: clip }
    linha — assim o header parece continuação da foto. A altura é a maior entre o zoom
    e a que cobre a largura toda (1.791 = proporção da foto), para nunca sobrar faixa
    branca nas laterais em tela larga. */
-.hero-photo img {
+.hero-frame {
   --hero-zoom: 1.15;
+  position: relative; flex: none; aspect-ratio: 2400 / 1340;
   height: max(calc(100% * var(--hero-zoom)), calc(100vw / 1.791));
-  width: auto; max-width: none; max-height: none; flex: none;
 }
+.hero-frame img { position: absolute; inset: 0; width: 100%; height: 100% }
+/* Três camadas no desktop: foto, título (z-index 1) e o recorte da modelo (z-index 2),
+   que tem as mesmas dimensões da foto e cobre exatamente os mesmos pixels. Nenhum
+   ancestral até .hero cria contexto de empilhamento, então o título entra entre elas. */
+.hero-cutout { z-index: 2; pointer-events: none }
 /* Em tela estreita, cobrir a altura toda deixaria só o tronco da aluna: a foto fica
-   com 64% da altura, e o espaço acima dela recebe a mesma cor do fundo (script.js). */
+   com 64% da altura, e o espaço acima dela recebe a mesma cor do fundo (script.js).
+   Ali o título fica embaixo, na frente da foto, e o recorte não é usado. */
 @media (max-width: 700px) {
-  .hero-photo img { height: 64vh }
+  .hero-frame { height: 64vh }
+  .hero-cutout { display: none }
 }
-.hero-title { position: absolute; left: 0; right: 0; bottom: 7vh; margin: 0; text-align: center; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: clamp(60px, 15vw, 300px); line-height: .86; letter-spacing: -.025em; color: var(--teal); white-space: nowrap; pointer-events: none }
+.hero-title { position: absolute; z-index: 1; left: 0; right: 0; bottom: 7vh; margin: 0; text-align: center; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: clamp(60px, 15vw, 300px); line-height: .86; letter-spacing: -.025em; color: var(--teal); white-space: nowrap; pointer-events: none }
+/* No desktop o título vai para o meio da área visível da hero (abaixo do header), onde
+   cruza o corpo da modelo; embaixo ele ficaria escondido atrás do Reformer. */
+@media (min-width: 701px) {
+  .hero-title { bottom: auto; top: calc(50% + 36px); transform: translateY(-50%) }
+  .br-sm { display: none }
+}
+/* No celular o título ocupa o espaço vazio entre o header e a foto (que tem 64vh e
+   encosta embaixo), em duas linhas: "Sinta mais" / "liberdade". */
+@media (max-width: 700px) {
+  .hero-title { bottom: auto; top: calc((100% - 64vh + 72px) / 2); transform: translateY(-50%); font-size: clamp(56px, 25vw, 140px); line-height: .9 }
+}
+/* Quarta camada (z-index 3): o mesmo título só em contorno, mascarado pelo recorte da
+   modelo. Fora dela a máscara é transparente e nada aparece; sobre ela, a letra que
+   sumiria atrás do corpo vira só o traço. Posição e tamanho da máscara vêm do
+   script.js, medidos no .hero-frame — sem eles a máscara fica com tamanho 0. */
+.hero-outline {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  -webkit-mask-image: url(./assets/hero-recorte.webp); mask-image: url(./assets/hero-recorte.webp);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-size: var(--m-w, 0) var(--m-h, 0); mask-size: var(--m-w, 0) var(--m-h, 0);
+  -webkit-mask-position: var(--m-x, 0) var(--m-y, 0); mask-position: var(--m-x, 0) var(--m-y, 0);
+}
+.hero-outline .hero-title { color: transparent; -webkit-text-fill-color: transparent; -webkit-text-stroke: 2px var(--teal) }
+.hero-outline .hero-title .script { -webkit-text-stroke-color: var(--rosa) }
+@media (max-width: 700px) { .hero-outline { display: none } }
 .hero-title .script { font-family: 'Monotype Corsiva', 'Apple Chancery', 'URW Chancery L', cursive; font-style: italic; color: var(--rosa) }
 
 .sheet { position: relative; z-index: 2; background: #fff; border-radius: 40px 40px 0 0; box-shadow: 0 -24px 60px rgba(43, 40, 42, .08) }
@@ -144,8 +176,11 @@ main { overflow-x: clip }
 .fcol { display: flex; flex-direction: column; gap: 14px; font-size: 16px }
 .fcol a { color: #fff; font-size: 16px }
 .fcol a:hover { color: var(--muted) }
-.fcol a.btn-top { width: 56px; height: 56px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .4); display: grid; place-items: center; color: #fff; font-size: 20px; transition: background .3s, transform .3s, color .3s }
-.fcol a.btn-top:hover { background: #fff; color: var(--ink); transform: translateY(-4px) }
+.fcol a.map-link { display: flex; flex-direction: column; gap: 10px; color: #fff; font-size: 15px; transition: transform .3s }
+.fcol a.map-link:hover { transform: translateY(-4px); color: #fff }
+.map-embed { display: block; width: 100%; height: 150px; border: 0; border-radius: 16px; pointer-events: none; background: rgba(255, 255, 255, .08); box-shadow: 0 0 0 1px rgba(255, 255, 255, .14) }
+.map-cta { color: var(--muted); transition: color .3s }
+.fcol a.map-link:hover .map-cta { color: #fff }
 .footer-brand { font-size: clamp(56px, 12vw, 190px); font-weight: 900; letter-spacing: -.045em; line-height: .85 }
 .footer-brand span { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; color: var(--teal) }
 .copy { font-size: 14px; color: var(--muted) }

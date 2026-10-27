@@ -90,7 +90,8 @@
   // linha onde o header a corta, e vira um degradê horizontal que acompanha cada ponto.
   // Recalculado no resize, porque o corte muda com a proporção da tela.
   const heroPhoto = document.querySelector('.hero-photo');
-  const heroImg = heroPhoto.querySelector('img');
+  const heroFrame = heroPhoto.querySelector('.hero-frame');
+  const heroImg = heroFrame.querySelector('img');
   let heroHeaderBg = '';
   function sampleHeroColors() {
     if (!heroImg.naturalWidth) return;
@@ -101,8 +102,16 @@
     ctx.drawImage(heroImg, 0, 0, cw, ch);
     // Offsets, e não getBoundingClientRect: não sofrem a escala que a rolagem aplica.
     const W = heroPhoto.clientWidth;
-    const iw = heroImg.offsetWidth, ih = heroImg.offsetHeight;
-    const il = heroImg.offsetLeft, it = heroImg.offsetTop;
+    // Medido no quadro (.hero-frame), que é quem fica posicionado na .hero-photo.
+    const iw = heroFrame.offsetWidth, ih = heroFrame.offsetHeight;
+    const il = heroFrame.offsetLeft, it = heroFrame.offsetTop;
+    // A máscara do contorno do título é o recorte da modelo: mesmo tamanho e posição
+    // do quadro, medidos a partir do .hero (a .hero-photo começa abaixo do header).
+    const ho = hero.querySelector('.hero-outline').style;
+    ho.setProperty('--m-w', iw + 'px');
+    ho.setProperty('--m-h', ih + 'px');
+    ho.setProperty('--m-x', heroPhoto.offsetLeft + il + 'px');
+    ho.setProperty('--m-y', heroPhoto.offsetTop + it + 'px');
     const row = Math.min(ch - 3, Math.max(2, Math.round(Math.max(0, -it) / ih * ch) + 2));
     const hex = (fx) => {
       const x = Math.min(cw - 3, Math.max(2, Math.round(fx * cw)));

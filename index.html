@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="./styles.css?v=9">
+<link rel="stylesheet" href="./styles.css?v=13">
 
 <!-- Dados estruturados (schema.org): empresa local para a busca do Google -->
 <script type="application/ld+json">
@@ -120,9 +120,16 @@
 <section id="inicio" class="hero-section">
   <div data-hero class="hero">
     <div class="hero-photo">
-      <img src="./assets/hero.jpg" alt="Aluna em silhueta fazendo uma abertura de pernas no Reformer, com o pé da frente apoiado na barra e os braços estendidos para cima" fetchpriority="high">
+      <div class="hero-frame">
+        <img src="./assets/hero.jpg" alt="Aluna em silhueta fazendo uma abertura de pernas no Reformer, com o pé da frente apoiado na barra e os braços estendidos para cima" fetchpriority="high">
+        <!-- Recorte da modelo, alinhado à foto e acima do título: o texto passa por trás dela -->
+        <img class="hero-cutout" src="./assets/hero-recorte.webp" alt="" aria-hidden="true">
+      </div>
     </div>
-    <h1 class="hero-title">Sinta <span class="script">mais</span> liberdade</h1>
+    <h1 class="hero-title">Sinta <span class="script">mais</span><br class="br-sm"> liberdade</h1>
+    <!-- Contorno do título sobre a modelo: mascarado pelo recorte, só aparece onde as
+         letras passam por trás dela, para a palavra continuar legível -->
+    <div class="hero-outline" aria-hidden="true"><div class="hero-title">Sinta <span class="script">mais</span><br class="br-sm"> liberdade</div></div>
   </div>
 </section>
 
@@ -260,9 +267,13 @@
         <span style="line-height:1.6;max-width:280px">Quadra 1, Setor Industrial, Lote 960, sobreloja 3 — Posto Avenida, em frente ao Corpo de Bombeiros. Gama, DF.</span>
         <span style="font-size:15px;color:#D6D3D4">Manhã e tarde</span>
       </div>
-      <div class="fcol" style="align-items:flex-start">
-        <span class="eyebrow-sm">Topo</span>
-        <a href="#inicio" data-to-top aria-label="Voltar ao topo" class="btn-top">↑</a>
+      <div class="fcol">
+        <span class="eyebrow-sm">Como chegar</span>
+        <!-- O mapa não recebe clique (pointer-events: none): o clique cai no link e abre o Google Maps -->
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Instituto%20Rosa%20Pilates%20e%20Fisioterapia%2C%20Quadra%201%20Setor%20Industrial%20Lote%20960%2C%20Gama%20-%20DF" target="_blank" rel="noopener" aria-label="Abrir a localização do Instituto Rosa no Google Maps">
+          <iframe class="map-embed" src="https://maps.google.com/maps?q=Instituto%20Rosa%20Pilates%20e%20Fisioterapia%2C%20Quadra%201%20Setor%20Industrial%20Lote%20960%2C%20Gama%20-%20DF&amp;z=16&amp;output=embed" title="Mapa com a localização do Instituto Rosa" loading="lazy" referrerpolicy="no-referrer-when-downgrade" tabindex="-1" aria-hidden="true"></iframe>
+          <span class="map-cta">Abrir no Google Maps ↗</span>
+        </a>
       </div>
     </div>
     <div class="footer-brand">Instituto <span>Rosa</span></div>
@@ -279,6 +290,6 @@
 <a data-fab data-wa href="#" target="_blank" rel="noopener" aria-label="Agendar pelo WhatsApp" class="fab">WhatsApp</a>
 
 <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-<script src="./script.js?v=5"></script>
+<script src="./script.js?v=7"></script>
 </body>
 </html>

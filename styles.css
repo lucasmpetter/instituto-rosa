@@ -37,7 +37,7 @@ img { display: block }
 .btn-footer:hover { background: var(--rosa); color: #fff }
 
 /* Header */
-.site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; box-sizing: border-box; padding: 14px var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: 24px; background: rgba(255, 255, 255, .78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); transition: box-shadow .5s, padding .5s }
+.site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; box-sizing: border-box; padding: 14px var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: 24px; background: rgba(255, 255, 255, .78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); transition: box-shadow .5s, padding .5s, background .4s }
 .logo { height: 44px; width: auto }
 .nav { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 36px) }
 .nav-link { font-size: 15px; color: var(--teal); transition: color .3s }
@@ -47,8 +47,22 @@ main { overflow-x: clip }
 /* Hero */
 .hero-section { position: sticky; top: 0; height: 100vh; min-height: 600px; z-index: 0; overflow: hidden }
 .hero { position: absolute; inset: 0; background: #fff; transform-origin: 50% 40%; will-change: transform }
-.hero-photo { position: absolute; top: 72px; bottom: 0; left: 0; right: 0 }
-.hero-photo img { width: 100%; height: 100%; object-fit: contain }
+.hero-photo { position: absolute; top: 72px; bottom: 0; left: 0; right: 0; display: flex; align-items: flex-end; justify-content: center; overflow: hidden }
+/* A foto encosta embaixo e cresce a partir da base: o excesso sai por cima, cortado
+   pela borda do header, que o script.js pinta com a cor do fundo da foto naquela
+   linha — assim o header parece continuação da foto. A altura é a maior entre o zoom
+   e a que cobre a largura toda (1.791 = proporção da foto), para nunca sobrar faixa
+   branca nas laterais em tela larga. */
+.hero-photo img {
+  --hero-zoom: 1.15;
+  height: max(calc(100% * var(--hero-zoom)), calc(100vw / 1.791));
+  width: auto; max-width: none; max-height: none; flex: none;
+}
+/* Em tela estreita, cobrir a altura toda deixaria só o tronco da aluna: a foto fica
+   com 64% da altura, e o espaço acima dela recebe a mesma cor do fundo (script.js). */
+@media (max-width: 700px) {
+  .hero-photo img { height: 64vh }
+}
 .hero-title { position: absolute; left: 0; right: 0; bottom: 7vh; margin: 0; text-align: center; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: clamp(60px, 15vw, 300px); line-height: .86; letter-spacing: -.025em; color: var(--teal); white-space: nowrap; pointer-events: none }
 .hero-title .script { font-family: 'Monotype Corsiva', 'Apple Chancery', 'URW Chancery L', cursive; font-style: italic; color: var(--rosa) }
 
@@ -97,30 +111,19 @@ main { overflow-x: clip }
 
 /* Depoimentos */
 .sec-depoimentos { background: #fff; position: relative; z-index: 3; padding: clamp(40px, 4vw, 64px) var(--gutter) }
-.depo-grid { gap: 20px; perspective: 1400px }
-.depo { background: var(--mist); display: flex; flex-direction: column; transition: transform .6s var(--ease), box-shadow .6s, opacity 1.1s }
-.depo-sm { border-radius: 20px; padding: 22px; gap: 16px }
-.depo-sm:hover, .depo-wide:hover { box-shadow: 0 24px 50px rgba(43, 40, 42, .12) }
-.depo-lg { border-radius: 24px; padding: clamp(24px, 2.6vw, 36px); gap: 28px }
-.depo-lg:hover { box-shadow: 0 30px 60px rgba(43, 40, 42, .12) }
-.depo-wide { border-radius: 20px; padding: 22px 26px; gap: 14px }
-.depo-head { display: flex; align-items: center; justify-content: space-between; gap: 12px }
-.depo-lg .depo-head { gap: 16px }
-.depo-head-row { justify-content: flex-start; gap: 16px; flex-wrap: wrap }
-.av { border-radius: 50%; object-fit: cover; flex: none; background: rgba(127, 127, 127, .08) }
-.av-40 { width: 40px; height: 40px }
-.av-64 { width: 64px; height: 64px }
-.depo-who { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; margin-left: auto; text-align: right }
-.depo-lg .depo-who { gap: 4px }
-.depo-name { font-size: 16px; color: var(--teal) }
-.depo-lg .depo-name { font-size: clamp(22px, 2vw, 28px) }
-.depo-wide .depo-name { font-size: clamp(20px, 1.8vw, 26px) }
-.stars { font-size: 13px; letter-spacing: 2px; color: var(--teal) }
-.depo-lg .stars { font-size: 22px; letter-spacing: 4px }
-.depo-wide .stars { font-size: 16px; letter-spacing: 3px }
-.depo p { margin: 0; text-align: justify; hyphens: auto; font-size: 15px; line-height: 1.5; color: var(--ink) }
-.depo-lg p { font-size: clamp(17px, 1.3vw, 20px); line-height: 1.55 }
-.clamp6 { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden }
+/* Cards todos iguais: 3 por linha no desktop, 2 no tablet, 1 no celular. Flex com
+   wrap centralizado, e não grid, para a última linha incompleta ficar no meio. */
+.depo-grid { --cols: 3; --gap: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap); perspective: 1400px }
+.depo { flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); box-sizing: border-box; background: var(--mist); border-radius: 24px; padding: clamp(24px, 2.4vw, 32px); display: flex; flex-direction: column; gap: 20px; transition: transform .6s var(--ease), box-shadow .6s, opacity 1.1s }
+.depo:hover { box-shadow: 0 24px 50px rgba(43, 40, 42, .12) }
+.depo-head { display: flex; align-items: center; gap: 14px }
+.av { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex: none; background: rgba(127, 127, 127, .08) }
+.depo-who { display: flex; flex-direction: column; gap: 4px }
+.depo-name { font-size: 19px; color: var(--teal) }
+.stars { font-size: 15px; letter-spacing: 3px; color: var(--teal) }
+.depo p { margin: 0; font-size: 17px; line-height: 1.6; color: var(--ink); text-wrap: pretty }
+@media (max-width: 1000px) { .depo-grid { --cols: 2 } }
+@media (max-width: 640px) { .depo-grid { --cols: 1 } }
 
 /* Rodapé */
 .site-footer { background: var(--ink); color: #fff; border-radius: 48px 48px 0 0; padding: 90px var(--gutter) 36px }

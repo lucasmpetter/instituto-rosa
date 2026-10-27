@@ -85,10 +85,56 @@
   const depthEls = document.querySelectorAll('[data-depth]');
   const panels = carrossel.querySelectorAll('[data-panel]');
 
+  // Header da cor da foto do hero. O fundo da foto não é uniforme (vinheta: claro no
+  // centro, ~#EEEBEA nas laterais), então a cor é lida da própria foto num canvas, na
+  // linha onde o header a corta, e vira um degradê horizontal que acompanha cada ponto.
+  // Recalculado no resize, porque o corte muda com a proporção da tela.
+  const heroPhoto = document.querySelector('.hero-photo');
+  const heroImg = heroPhoto.querySelector('img');
+  let heroHeaderBg = '';
+  function sampleHeroColors() {
+    if (!heroImg.naturalWidth) return;
+    const cw = 480, ch = Math.round(cw * heroImg.naturalHeight / heroImg.naturalWidth);
+    const c = document.createElement('canvas');
+    c.width = cw; c.height = ch;
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(heroImg, 0, 0, cw, ch);
+    // Offsets, e não getBoundingClientRect: não sofrem a escala que a rolagem aplica.
+    const W = heroPhoto.clientWidth;
+    const iw = heroImg.offsetWidth, ih = heroImg.offsetHeight;
+    const il = heroImg.offsetLeft, it = heroImg.offsetTop;
+    const row = Math.min(ch - 3, Math.max(2, Math.round(Math.max(0, -it) / ih * ch) + 2));
+    const hex = (fx) => {
+      const x = Math.min(cw - 3, Math.max(2, Math.round(fx * cw)));
+      const d = ctx.getImageData(x - 2, row - 2, 5, 5).data;
+      let r = 0, g = 0, b = 0;
+      for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; }
+      const n = d.length / 4;
+      return '#' + [r, g, b].map((v) => Math.round(v / n).toString(16).padStart(2, '0')).join('');
+    };
+    const stops = [];
+    for (let t = 0; t <= 10; t++) stops.push(`${hex((t / 10 * W - il) / iw)} ${t * 10}%`);
+    heroHeaderBg = `linear-gradient(to right, ${stops.join(', ')})`;
+    // No celular a foto não alcança o header: o espaço acima dela ganha o mesmo degradê.
+    hero.style.background = it > 1 ? heroHeaderBg : '';
+    tick();
+  }
+  if (heroImg.complete) sampleHeroColors(); else heroImg.addEventListener('load', sampleHeroColors);
+  let resampleRaf = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(resampleRaf);
+    resampleRaf = requestAnimationFrame(sampleHeroColors);
+  });
+
   function tick() {
     const y = scrollY, vh = innerHeight, vw = innerWidth;
-    header.style.boxShadow = y > 20 ? '0 10px 30px rgba(43,40,42,.08)' : 'none';
     const p = Math.min(1, y / vh);
+    // Enquanto o header está sobre a foto, ele é a foto: sem sombra, na cor dela, e
+    // clareando junto com o hero, que perde opacidade ao rolar.
+    const onHero = heroHeaderBg && y < vh - 72;
+    const fade = `rgba(255,255,255,${(p * .5).toFixed(3)})`;
+    header.style.background = onHero ? `linear-gradient(${fade}, ${fade}), ${heroHeaderBg}` : '';
+    header.style.boxShadow = !onHero && y > 20 ? '0 10px 30px rgba(43,40,42,.08)' : 'none';
     hero.style.transform = `scale(${1 - p * .07}) translateY(${-p * 50}px)`;
     hero.style.opacity = 1 - p * .5;
     const show = y > vh * 1.1 && y < document.body.scrollHeight - vh * 1.5;

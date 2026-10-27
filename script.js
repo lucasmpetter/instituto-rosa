@@ -156,11 +156,14 @@
     const e = Math.min(1, Math.max(0, (vh - r.top) / vh));
     const ease = 1 - Math.pow(1 - e, 3);
     track.style.transform = `translate3d(${-pr * max + (1 - ease) * vw * 1.1 - (1 - Math.pow(1 - x, 2)) * vw * .7}px,0,0)`;
+    // A distância é medida em larguras de tela; no celular um card vizinho já fica a
+    // ~0,7 tela do centro, e o zoom do desktop (1,1) fazia ele invadir o do meio.
+    const zoomK = vw <= 700 ? .35 : 1.1;
     panels.forEach((el) => {
       const b = el.getBoundingClientRect();
       const d = (b.left + b.width / 2 - vw / 2) / vw;
       const ad = Math.min(1.2, Math.abs(d));
-      el.style.transform = `rotateY(${-Math.max(-1.2, Math.min(1.2, d)) * 34}deg) scale(${1 + ad * ad * 1.1})`;
+      el.style.transform = `rotateY(${-Math.max(-1.2, Math.min(1.2, d)) * 34}deg) scale(${1 + ad * ad * zoomK})`;
       el.parentElement.parentElement.style.zIndex = Math.round(ad * 100);
     });
   }

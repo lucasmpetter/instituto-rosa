@@ -43,6 +43,9 @@
     wrap.innerHTML = '<div><div data-panel class="panel"></div></div>';
     const v = document.createElement('video');
     v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
+    // Atributos, além das propriedades: o Safari do iPhone confere o atributo muted
+    // para liberar a reprodução automática.
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('autoplay', '');
     v.setAttribute('aria-label', `Vídeo: ${alt}`);
     v.title = alt;
     v.dataset.src = src;
@@ -63,6 +66,10 @@
       });
     });
   }, { rootMargin: '100% 0px' }).observe(carrossel);
+  // No Modo de Pouca Energia o iPhone recusa play() sem gesto do usuário: o primeiro
+  // toque na página tenta de novo os vídeos que já receberam src.
+  const retryPlay = () => { if (!reduce) videos.forEach((v) => { if (v.src && v.paused) v.play().catch(() => {}); }); };
+  ['touchend', 'click'].forEach((ev) => document.addEventListener(ev, retryPlay, { passive: true }));
 
   // Revelar ao rolar
   const io = new IntersectionObserver((es) => es.forEach((e) => {
@@ -103,6 +110,7 @@
   const heroFrame = heroPhoto.querySelector('.hero-frame');
   const heroImg = heroFrame.querySelector('img');
   let heroHeaderBg = '';
+  let decodeRetries = 0;
   function sampleHeroColors() {
     if (!heroImg.naturalWidth) return;
     const cw = 480, ch = Math.round(cw * heroImg.naturalHeight / heroImg.naturalWidth);
@@ -110,6 +118,13 @@
     c.width = cw; c.height = ch;
     const ctx = c.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(heroImg, 0, 0, cw, ch);
+    // No iPhone a foto pode estar "complete" mas ainda não decodificada: o canvas sai
+    // transparente e a cor lida vira #000 (caixa preta acima da foto). Sem pixel opaco,
+    // não pinta nada e espera a decodificação.
+    if (!ctx.getImageData(cw >> 1, ch >> 1, 1, 1).data[3]) {
+      if (decodeRetries++ < 5) setTimeout(() => heroImg.decode().then(sampleHeroColors, () => {}), 150);
+      return;
+    }
     // Offsets, e não getBoundingClientRect: não sofrem a escala que a rolagem aplica.
     const W = heroPhoto.clientWidth;
     // Medido no quadro (.hero-frame), que é quem fica posicionado na .hero-photo.
@@ -138,7 +153,8 @@
     hero.style.background = it > 1 ? heroHeaderBg : '';
     tick();
   }
-  if (heroImg.complete) sampleHeroColors(); else heroImg.addEventListener('load', sampleHeroColors);
+  // decode() garante a foto pronta para o canvas antes da leitura.
+  heroImg.decode().then(sampleHeroColors, () => heroImg.addEventListener('load', sampleHeroColors));
   let resampleRaf = 0;
   window.addEventListener('resize', () => {
     cancelAnimationFrame(resampleRaf);

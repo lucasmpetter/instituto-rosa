@@ -46,7 +46,7 @@ main { overflow-x: clip }
 
 /* Hero */
 .hero-section { position: sticky; top: 0; height: 100vh; min-height: 600px; z-index: 0; overflow: hidden }
-.hero { position: absolute; inset: 0; background: #fff; transform-origin: 50% 40%; will-change: transform }
+.hero { position: absolute; inset: 0; background: #fff; transform-origin: 50% 40% }
 .hero-photo { position: absolute; top: 72px; bottom: 0; left: 0; right: 0; display: flex; align-items: flex-end; justify-content: center; overflow: hidden }
 /* A foto encosta embaixo e cresce a partir da base: o excesso sai por cima, cortado
    pela borda do header, que o script.js pinta com a cor do fundo da foto naquela
@@ -72,15 +72,19 @@ main { overflow-x: clip }
 }
 .hero-title { position: absolute; z-index: 1; left: 0; right: 0; bottom: 7vh; margin: 0; text-align: center; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: clamp(60px, 15vw, 300px); line-height: .86; letter-spacing: -.025em; color: var(--teal); white-space: nowrap; pointer-events: none }
 /* No desktop o título vai para o meio da área visível da hero (abaixo do header), onde
-   cruza o corpo da modelo; embaixo ele ficaria escondido atrás do Reformer. */
+   cruza o corpo da modelo; embaixo ele ficaria escondido atrás do Reformer.
+   Centralizado descontando metade da própria altura em `em` (.48em numa linha, .95em
+   nas duas do celular — medidos; o "mais" em outra fonte deixa a caixa mais alta que o
+   line-height), e não com transform: translateY(-50%). O transform virava camada de GPU,
+   e no Safari do iPhone ela aparecia como caixa preta atrás do título até o 1º toque. */
 @media (min-width: 701px) {
-  .hero-title { bottom: auto; top: calc(50% + 36px); transform: translateY(-50%) }
+  .hero-title { bottom: auto; top: calc(50% + 36px - .48em) }
   .br-sm { display: none }
 }
 /* No celular o título ocupa o espaço vazio entre o header e a foto (que tem 64vh e
    encosta embaixo), em duas linhas: "Sinta mais" / "liberdade". */
 @media (max-width: 700px) {
-  .hero-title { bottom: auto; top: calc((100% - 64vh + 72px) / 2); transform: translateY(-50%); font-size: clamp(56px, 25vw, 140px); line-height: .9 }
+  .hero-title { bottom: auto; top: calc((100% - 64vh + 72px) / 2 - .95em); font-size: clamp(56px, 25vw, 140px); line-height: .9 }
 }
 /* Quarta camada (z-index 3): o mesmo título só em contorno, mascarado pelo recorte da
    modelo. Fora dela a máscara é transparente e nada aparece; sobre ela, a letra que

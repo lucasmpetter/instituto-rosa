@@ -2,9 +2,12 @@
 (() => {
   const WHATSAPP = '5561999355665';
   const WA_MSG = 'Olá, Viviane! Vim pelo site e gostaria de agendar uma avaliação.';
-  // Ao trocar um vídeo mantendo o nome do arquivo, suba a versão dele aqui
-  // para furar o cache do Cloudflare e dos navegadores.
-  const VIDEO_VERSIONS = { 6: 2 };
+  // Vídeos em 720x900 H.264 sem áudio (~0,4–1 MB cada; eram 6–19 MB em 1080x1350),
+  // cada um com uma capa JPEG do mesmo nome que aparece na hora, antes do vídeo
+  // carregar — em conexão lenta a pessoa vê a cena em vez de um quadro cinza.
+  // Ao trocar vídeos mantendo os nomes, suba VIDEO_VERSION: fura o cache do
+  // Cloudflare e dos navegadores (vídeo e capa juntos).
+  const VIDEO_VERSION = 3;
   const VIDEOS = [
     'Aluna sentada na Chair fazendo exercício com o anel de Pilates, acompanhada pela fisioterapeuta',
     'Fisioterapeuta fazendo alongamento e liberação nas pernas de uma paciente deitada na maca',
@@ -13,7 +16,11 @@
     'Aluno ajoelhado no Reformer abrindo os braços com as alças do aparelho',
     'Aluna em pé no Reformer fazendo agachamento com as pernas afastadas, acompanhada pela fisioterapeuta',
     'Aluno fazendo exercício de equilíbrio em pé sobre uma prancha',
-  ].map((alt, i) => ({ src: `./assets/video-${i + 1}.mp4${VIDEO_VERSIONS[i + 1] ? `?v=${VIDEO_VERSIONS[i + 1]}` : ''}`, alt }));
+  ].map((alt, i) => ({
+    src: `./assets/video-${i + 1}.mp4?v=${VIDEO_VERSION}`,
+    poster: `./assets/video-${i + 1}.jpg?v=${VIDEO_VERSION}`,
+    alt,
+  }));
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -27,9 +34,10 @@
   document.querySelector('[data-year]').textContent = new Date().getFullYear();
 
   // Painéis de vídeo do carrossel. O src só entra quando a seção se aproxima,
-  // para não baixar ~100 MB de vídeo na abertura da página.
+  // para não baixar os vídeos (~5 MB no total) na abertura da página. A capa
+  // entra no mesmo momento e, por ser leve, aparece antes do vídeo começar.
   const track = document.querySelector('[data-track]');
-  const videos = VIDEOS.map(({ src, alt }) => {
+  const videos = VIDEOS.map(({ src, poster, alt }) => {
     const wrap = document.createElement('div');
     wrap.className = 'panel-wrap';
     wrap.innerHTML = '<div><div data-panel class="panel"></div></div>';
@@ -38,6 +46,7 @@
     v.setAttribute('aria-label', `Vídeo: ${alt}`);
     v.title = alt;
     v.dataset.src = src;
+    v.dataset.poster = poster;
     wrap.querySelector('[data-panel]').appendChild(v);
     track.appendChild(wrap);
     return v;
@@ -47,6 +56,7 @@
     es.forEach((e) => {
       videos.forEach((v) => {
         if (e.isIntersecting) {
+          if (!v.poster) v.poster = v.dataset.poster;
           if (!v.src) v.src = v.dataset.src;
           if (!reduce) v.play().catch(() => {});
         } else if (v.src) v.pause();
@@ -144,8 +154,11 @@
     const fade = `rgba(255,255,255,${(p * .5).toFixed(3)})`;
     header.style.background = onHero ? `linear-gradient(${fade}, ${fade}), ${heroHeaderBg}` : '';
     header.style.boxShadow = !onHero && y > 20 ? '0 10px 30px rgba(43,40,42,.08)' : 'none';
-    hero.style.transform = `scale(${1 - p * .07}) translateY(${-p * 50}px)`;
-    hero.style.opacity = 1 - p * .5;
+    // Parada no topo, a hero fica sem transform/opacity nenhum: no Safari do iPhone uma
+    // camada de GPU criada no carregamento podia aparecer como caixa preta atrás do
+    // título até o primeiro toque. Só vira camada quando a rolagem começa de fato.
+    hero.style.transform = p > 0 ? `scale(${1 - p * .07}) translateY(${-p * 50}px)` : '';
+    hero.style.opacity = p > 0 ? 1 - p * .5 : '';
     const show = y > vh * 1.1 && y < document.body.scrollHeight - vh * 1.5;
     fabs.forEach((fab) => {
       fab.style.opacity = show ? 1 : 0;
